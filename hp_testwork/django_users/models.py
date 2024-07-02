@@ -46,3 +46,4 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         """
         return reverse('profile_detail', kwargs={'id': self.id})
 
+# test
