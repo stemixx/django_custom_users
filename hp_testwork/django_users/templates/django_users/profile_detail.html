@@ -1,0 +1,23 @@
+{% extends 'django_users/base.html' %}
+
+{% block content %}
+<div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+
+                <div class="col-md-9">
+                     <h5 class="card-title">
+                        {{ profile }}
+                    </h5>
+                    <div class="card-text">
+                        <ul>
+                            <li>Логин: {{ profile.email }}</li>
+                            <li>Заходил: {{ profile.last_login }}</li>
+                        </ul>
+                    <a href="{% url 'profile_edit' %}" class="btn btn-sm btn-primary">Редактировать профиль</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
