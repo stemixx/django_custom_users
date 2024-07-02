@@ -142,36 +142,36 @@ class UserLoginView(SuccessMessageMixin, LoginView):
 #         return context
 #
 #
-# class UserRegisterView(UserIsNotAuthenticated, CreateView):
-#     """
-#     Представление регистрации на сайте с формой регистрации
-#     """
-#     form_class = UserRegisterForm
-#     success_url = reverse_lazy('home')
-#     template_name = 'system/registration/user_register.html'
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['title'] = 'Регистрация на сайте'
-#         return context
-#
-#     def form_valid(self, form):
-#         user = form.save(commit=False)
-#         user.is_active = False
-#         user.save()
-#         # Функционал для отправки письма и генерации токена
-#         token = default_token_generator.make_token(user)
-#         uid = urlsafe_base64_encode(force_bytes(user.pk))
-#         activation_url = reverse_lazy('confirm_email', kwargs={'uidb64': uid, 'token': token})
-#         current_site = Site.objects.get_current().domain
-#         send_mail(
-#             'Подтвердите свой электронный адрес',
-#             f'Пожалуйста, перейдите по следующей ссылке, чтобы подтвердить свой адрес электронной почты: http://{current_site}{activation_url}',
-#             'service.notehunter@gmail.com',
-#             [user.email],
-#             fail_silently=False,
-#         )
-#         return redirect('email_confirmation_sent')
+class UserRegisterView(UserIsNotAuthenticated, CreateView):
+    """
+    Представление регистрации на сайте с формой регистрации
+    """
+    form_class = UserRegisterForm
+    success_url = reverse_lazy('home')
+    template_name = 'django_users/user_register.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Регистрация на сайте'
+        return context
+
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        user.is_active = False
+        user.save()
+        # Функционал для отправки письма и генерации токена
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        activation_url = reverse_lazy('confirm_email', kwargs={'uidb64': uid, 'token': token})
+        # current_site = Site.objects.get_current().domain
+        send_mail(
+            'Подтвердите свой электронный адрес',
+            f'Пожалуйста, перейдите по следующей ссылке, чтобы подтвердить свой адрес электронной почты', #: http://{current_site}{activation_url}',
+            'service.notehunter@gmail.com',
+            [user.email],
+            fail_silently=False,
+        )
+        return redirect('email_confirmation_sent')
 #
 #
 # class UserConfirmEmailView(View):
