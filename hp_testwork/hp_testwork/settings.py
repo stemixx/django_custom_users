@@ -30,6 +30,8 @@ ALLOWED_HOSTS = []
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
+AUTH_USER_MODEL = 'django_users.CustomUser'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -134,4 +136,8 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'django_users.CustomUser'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_HOST_USER = 'stemix@mail.ru'
+EMAIL_HOST_PASSWORD = 'm81J8LtUJJvuv8if5xhh'
+EMAIL_PORT = 465
