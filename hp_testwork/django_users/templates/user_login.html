@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+        <h4>Авторизация на сайте</h4>
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+             <div class="input-group">
+              {{ form.username }}
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="input-group">
+              {{ form.password }}
+            </div>
+          </div>
+          <div class="d-grid gap-2 d-md-block mt-2">
+            <button type="submit" class="btn btn-dark">Авторизоваться</button>
+          </div>
+        </form>
+
+{% endblock %}

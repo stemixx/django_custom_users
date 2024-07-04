@@ -9,9 +9,12 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 
 class CustomUserLoginForm(AuthenticationForm):
-    # username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
-    # password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
-    username = forms.EmailField(label='Email', max_length=254)
+    username = forms.EmailField(max_length=254, widget=forms.TextInput(attrs={'placeholder': 'e-mail'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'password'}))
+
+
+class UserListForm(forms.Form):
+    users = forms.ModelMultipleChoiceField(queryset=CustomUser.objects.all())
 
 
 class UserUpdateForm(forms.ModelForm):

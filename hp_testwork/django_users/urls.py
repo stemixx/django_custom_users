@@ -1,15 +1,19 @@
-from .views import CustomUserLoginView
+from .views import MainView, CustomUserLoginView, CustomLogoutView, UsersListView, ProfileUpdateView, ProfileDetailView, UserRegisterView
 from django.urls import path
 
-from .views import ProfileUpdateView, ProfileDetailView, \
-    UserRegisterView#, UserLoginView, UserPasswordChangeView, \
+# from .views import ProfileUpdateView, ProfileDetailView, \
+#     UserRegisterView#, UserLoginView, UserPasswordChangeView, \
     # UserForgotPasswordView, UserPasswordResetConfirmView, UserConfirmEmailView, EmailConfirmationSentView, \
     # EmailConfirmedView, EmailConfirmationFailedView
 
 urlpatterns = [
+    path('', MainView.as_view(), name='main'),
+    path('login/', CustomUserLoginView.as_view(), name='login'),
+    path('logout/', CustomLogoutView.as_view(), name='logout'),
+    path('users_list/', UsersListView.as_view(), name='user_list'),
     path('user/edit/', ProfileUpdateView.as_view(), name='profile_edit'),
     path('user/<uuid:pk>/', ProfileDetailView.as_view(), name='profile_detail'),
-    path('login/', CustomUserLoginView.as_view(), name='login'),
+
     # path('password-change/', UserPasswordChangeView.as_view(), name='password_change'),
     # path('password-reset/', UserForgotPasswordView.as_view(), name='password_reset'),
     # path('set-new-password/<uidb64>/<token>/', UserPasswordResetConfirmView.as_view(), name='password_reset_confirm'),

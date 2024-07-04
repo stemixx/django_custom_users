@@ -1,6 +1,6 @@
-from django.contrib.auth import get_user_model, login
+from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordResetView, PasswordResetConfirmView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordResetView, PasswordResetConfirmView
 from django.contrib.messages.views import SuccessMessageMixin
 # from django.contrib.sites.models import Site
 from django.core.mail import send_mail
@@ -11,10 +11,23 @@ from django.urls import reverse_lazy
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from .models import CustomUser
-from .forms import CustomUserLoginForm, UserRegisterForm, UserUpdateForm, ProfileUpdateForm
+from .forms import CustomUserLoginForm, UserListForm, UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 from .services.mixins import UserIsNotAuthenticated
 
 User = get_user_model()
+
+
+class MainView(TemplateView):
+    """
+    Главная страница сайта
+    """
+    form_class = CustomUserLoginForm
+    template_name = 'main.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Главная страница сайта'
+        return context
 
 
 class CustomUserLoginView(LoginView):
@@ -22,8 +35,26 @@ class CustomUserLoginView(LoginView):
     Представление для авторизации пользователей
     """
     form_class = CustomUserLoginForm
-    # authentication_form = CustomUserLoginForm
-    template_name = 'django_users/user_login.html'
+    template_name = 'user_login.html'
+    success_url = reverse_lazy('main')
+
+
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('login')
+
+
+class UsersListView(TemplateView):
+    """
+    Страница со списком пользователей
+    """
+    template_name = 'users_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = UserListForm()
+        context['title'] = 'Список пользователей'
+        context['form'] = form
+        return context
 
 
 class ProfileDetailView(DetailView):
@@ -32,7 +63,7 @@ class ProfileDetailView(DetailView):
     """
     model = CustomUser
     context_object_name = 'profile'
-    template_name = 'django_users/profile_detail.html'
+    template_name = 'profile_detail.html'
     queryset = model.objects.all()
 
     def get_context_data(self, **kwargs):
@@ -47,7 +78,7 @@ class ProfileUpdateView(UpdateView):
     """
     model = CustomUser
     form_class = ProfileUpdateForm
-    template_name = 'django_users/profile_edit.html'
+    template_name = 'profile_edit.html'
 
     def get_object(self, queryset=None):
         # return self.request.user.id
@@ -83,7 +114,7 @@ class UserLoginView(SuccessMessageMixin, LoginView):
     Авторизация на сайте
     """
     form_class = CustomUserLoginForm
-    template_name = 'django_users/user_login.html'
+    template_name = 'user_login.html'
     next_page = 'home'
     success_message = 'Добро пожаловать на сайт!'
 
@@ -98,7 +129,7 @@ class UserLoginView(SuccessMessageMixin, LoginView):
 #     Изменение пароля пользователя
 #     """
 #     form_class = UserPasswordChangeForm
-#     template_name = 'django_users/user_password_change.html'
+#     template_name = 'user_password_change.html'
 #     success_message = 'Ваш пароль был успешно изменён!'
 #
 #     def get_context_data(self, **kwargs):
@@ -148,7 +179,7 @@ class UserRegisterView(UserIsNotAuthenticated, CreateView):
     """
     form_class = UserRegisterForm
     success_url = reverse_lazy('home')
-    template_name = 'django_users/user_register.html'
+    template_name = 'user_register.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
