@@ -1,11 +1,12 @@
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordResetView, PasswordResetConfirmView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordResetView, \
+    PasswordResetConfirmView
 from django.contrib.messages.views import SuccessMessageMixin
 # from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.db import transaction
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render
 from django.views.generic import DetailView, CreateView, View, TemplateView, UpdateView
 from django.urls import reverse_lazy
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -38,6 +39,11 @@ class CustomUserLoginView(LoginView):
     template_name = 'user_login.html'
     success_url = reverse_lazy('main')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Авторизация'
+        return context
+
 
 class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('login')
@@ -57,13 +63,13 @@ class UsersListView(TemplateView):
         return context
 
 
-class ProfileDetailView(DetailView):
+class UserDetailView(DetailView):
     """
-    Представление для просмотра профиля
+    Представление для просмотра данных о пользователе
     """
     model = CustomUser
-    context_object_name = 'profile'
-    template_name = 'profile_detail.html'
+    context_object_name = 'custom_user'
+    template_name = 'user_detail.html'
     queryset = model.objects.all()
 
     def get_context_data(self, **kwargs):
@@ -72,16 +78,15 @@ class ProfileDetailView(DetailView):
         return context
 
 
-class ProfileUpdateView(UpdateView):
+class UserEditView(UpdateView):
     """
     Представление для редактирования профиля
     """
     model = CustomUser
     form_class = ProfileUpdateForm
-    template_name = 'profile_edit.html'
+    template_name = 'user_edit.html'
 
     def get_object(self, queryset=None):
-        # return self.request.user.id
         return get_object_or_404(CustomUser, id=self.request.user.id)
 
     def get_context_data(self, **kwargs):
@@ -103,10 +108,10 @@ class ProfileUpdateView(UpdateView):
             else:
                 context.update({'user_form': user_form})
                 return self.render_to_response(context)
-        return super(ProfileUpdateView, self).form_valid(form)
+        return super(UserEditView, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('profile_detail', kwargs={'id': self.object.uuid})
+        return reverse_lazy('user_detail', kwargs={'pk': self.object.id})
 
 
 class UserLoginView(SuccessMessageMixin, LoginView):
@@ -197,8 +202,9 @@ class UserRegisterView(UserIsNotAuthenticated, CreateView):
         # current_site = Site.objects.get_current().domain
         send_mail(
             'Подтвердите свой электронный адрес',
-            f'Пожалуйста, перейдите по следующей ссылке, чтобы подтвердить свой адрес электронной почты', #: http://{current_site}{activation_url}',
-            'service.notehunter@gmail.com',
+            f'Пожалуйста, перейдите по следующей ссылке, чтобы подтвердить свой адрес электронной почты',
+            #: http://{current_site}{activation_url}',
+            'stemix@mail.ru',
             [user.email],
             fail_silently=False,
         )
@@ -247,7 +253,6 @@ class UserRegisterView(UserIsNotAuthenticated, CreateView):
 #         context = super().get_context_data(**kwargs)
 #         context['title'] = 'Ваш электронный адрес не активирован'
 #         return context
-
 
 
 # class LoginUser(DataMixin, LoginView):

@@ -1,11 +1,10 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import get_user_model
 from .models import CustomUser
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 
 
 class CustomUserLoginForm(AuthenticationForm):
@@ -14,17 +13,26 @@ class CustomUserLoginForm(AuthenticationForm):
 
 
 class UserListForm(forms.Form):
-    users = forms.ModelMultipleChoiceField(queryset=CustomUser.objects.all())
+    """
+    Форма отображения списка пользователей
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(UserListForm, self).__init__(*args, **kwargs)
+        users = CustomUser.objects.all()
+        choices = [(user.id, user.email) for user in users]
+        self.fields['users'] = forms.ChoiceField(choices=choices, widget=forms.Select, label="Пользователи")
 
 
-class UserUpdateForm(forms.ModelForm):
+class UserUpdateForm(UserChangeForm):
     """
     Форма обновления данных пользователя
     """
+    email = forms.EmailField(disabled=True)
 
     class Meta:
         model = CustomUser
-        fields = ('email', )
+        fields = ('email', 'username')
 
     def __init__(self, *args, **kwargs):
         """
@@ -37,23 +45,15 @@ class UserUpdateForm(forms.ModelForm):
                 'autocomplete': 'off'
             })
 
-    def clean_email(self):
-        """
-        Проверка email на уникальность
-        """
-        email = self.cleaned_data.get('email')
-        if email and User.objects.filter(email=email).exists():
-            raise forms.ValidationError('Email адрес должен быть уникальным')
-        return email
 
 
-class ProfileUpdateForm(forms.ModelForm):
+class ProfileUpdateForm(UserChangeForm):
     """
     Форма обновления данных профиля пользователя
     """
     class Meta:
         model = CustomUser
-        fields = ('email',)
+        fields = ('username',)
 
     def __init__(self, *args, **kwargs):
         """
@@ -73,6 +73,7 @@ class UserRegisterForm(UserCreationForm):
     """
 
     class Meta(UserCreationForm.Meta):
+        model = CustomUser
         fields = UserCreationForm.Meta.fields + ('email', )
 
     def clean_email(self):
@@ -82,8 +83,8 @@ class UserRegisterForm(UserCreationForm):
         email = self.cleaned_data.get('email')
         # username = self.cleaned_data.get('username')
         # if email and User.objects.filter(email=email).exclude(username=username).exists():
-        if email and User.objects.filter(email=email).exists():
-            raise forms.ValidationError('Такой email уже используется в системе')
+        if email and CustomUser.objects.filter(email=email).exists():
+            raise forms.ValidationError('Такой email уже используется в системе!')
         return email
 
     def __init__(self, *args, **kwargs):
@@ -92,10 +93,10 @@ class UserRegisterForm(UserCreationForm):
         """
         super().__init__(*args, **kwargs)
         for field in self.fields:
-            # self.fields['username'].widget.attrs.update({"placeholder": 'Придумайте свой логин'})
+            print(self.fields)
+            # self.fields['pk'].widget.attrs.update({"placeholder": 'Придумайте свой id'})
             self.fields['email'].widget.attrs.update({"placeholder": 'Введите свой email'})
-            # self.fields['first_name'].widget.attrs.update({"placeholder": 'Ваше имя'})
-            # self.fields["last_name"].widget.attrs.update({"placeholder": 'Ваша фамилия'})
+
             self.fields['password1'].widget.attrs.update({"placeholder": 'Придумайте свой пароль'})
             self.fields['password2'].widget.attrs.update({"placeholder": 'Повторите придуманный пароль'})
             self.fields[field].widget.attrs.update({"class": "form-control", "autocomplete": "off"})
@@ -112,9 +113,9 @@ class UserLoginForm(AuthenticationForm):
         """
         super().__init__(*args, **kwargs)
         for field in self.fields:
-            self.fields['username'].widget.attrs['placeholder'] = 'Логин пользователя'
+            self.fields['email'].widget.attrs['placeholder'] = 'Логин пользователя'
             self.fields['password'].widget.attrs['placeholder'] = 'Пароль пользователя'
-            self.fields['username'].label = 'Логин'
+            self.fields['email'].label = 'Логин'
             self.fields[field].widget.attrs.update({
                 'class': 'form-control',
                 'autocomplete': 'off'
