@@ -1,0 +1,11 @@
+version: '3.11'
+services:
+   web:
+       # Берем Dockerfile
+       build: ./app
+       container_name: django
+       command: python manage.py runserver localhost:8000
+       volumes:
+           - ./app/:/usr/src/app/
+       ports:
+           - 8000:8000

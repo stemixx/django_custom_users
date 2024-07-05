@@ -16,8 +16,10 @@
         </h5>
         <div class="card-text">
           <ul>
-            <li>Логин: {{ custom_user.username }}</li>
-            <li>Заходил: {{ custom_user.last_login }}</li>
+            <h4>Страница пользователя</h4>
+            <li>E-mail: {{ user.email }}</li>
+            <li>Логин: {{ user.username }}</li>
+            <li>Заходил: {{ user.last_login }}</li>
           </ul>
           <a href="{% url 'user_edit' %}" class="btn btn-sm btn-primary">Редактировать профиль</a>
         </div>
