@@ -17,13 +17,15 @@
     <div class="mb-3">
       {{ form.password }}
     </div>
-    <div class="text-center">
       <button type="submit" class="btn btn-primary">Войти</button>
-    </div>
   </form>
   <form method="post" action="{% url 'register' %}" style="display: inline;">
     {% csrf_token %}
     <button type="submit" class="btn btn-primary">Регистрация</button>
+  </form>
+  <form method="post" action="{% url 'password_reset' %}" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Забыли пароль?</button>
   </form>
 
 </div>

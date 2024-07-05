@@ -41,9 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'django.contrib.sites',
+    'django.contrib.sites',
     'django_users',
 ]
+
+SITE_ID = 2
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -140,4 +142,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.mail.ru'
 EMAIL_HOST_USER = 'stemix@mail.ru'
 EMAIL_HOST_PASSWORD = 'm81J8LtUJJvuv8if5xhh'
-EMAIL_PORT = 465
+EMAIL_PORT = 2525
