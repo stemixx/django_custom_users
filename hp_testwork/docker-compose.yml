@@ -1,11 +1,41 @@
-version: '3.11'
+version: '3'
 services:
    web:
        # Берем Dockerfile
-       build: ./app
-       container_name: django
-       command: python manage.py runserver localhost:8000
-       volumes:
-           - ./app/:/usr/src/app/
+       build: .
+       container_name: django_users
+       # Открываем порт на машине и перенаправляем на такой же порт в контейнере
        ports:
-           - 8000:8000
+           - "8000:8000"
+       volumes:
+           - ./:/usr/src/app/
+       command: python manage.py runserver 127.0.0.1:8000
+
+       env_file:
+           - .env.dev
+       # Зависимость от сервиса Postgres
+       depends_on:
+           - db
+       networks:
+           - backend
+
+   db:
+       image: postgres
+       container_name: postgres_django_users
+       environment:
+           POSTGRES_DB: hp_test2
+           POSTGRES_USER: hp_user
+           POSTGRES_PASSWORD: pas$word123!
+           POSTGRES_HOST_AUTH_METHOD: trust
+       # Связывание тома с директорией в контейнере для сохранения данных postgres
+       volumes:
+           - pg_data:/var/lib/postgresql/data/
+       ports:
+           - "5432:5432"
+
+volumes:
+    pg_data:
+
+networks:
+     backend:
+       driver: bridge

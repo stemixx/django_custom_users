@@ -1,7 +1,8 @@
 FROM python:3.11
 
 # Определяем переменные среды
-ENV DJANGO_SETTINGS_MODULE=myproject.settings
+ENV DJANGO_SETTINGS_MODULE=hp_testwork.settings
+ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # рабочая директория внутри проекта
@@ -19,6 +20,3 @@ RUN pip install -r requirements.txt
 
 # Прослушиваем порт 8000
 EXPOSE 8000
-
-# Запускаем команду для работы приложения
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
