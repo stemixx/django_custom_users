@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import environ
 import os
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -24,13 +25,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # env = environ.Env(
 #     DEBUG=(bool, False),
 # )
-environ.Env.read_env(os.path.join(BASE_DIR, '.env.dev'))
+
+# при разработке на windows выбираем файл с переменными окружения .env.dev
+if sys.platform.startswith("win"):
+    environ.Env.read_env(os.path.join(BASE_DIR, '.env.dev'))
+# при разработке на docker - .docker.env.dev
+else:
+    environ.Env.read_env(os.path.join(BASE_DIR, '.docker.env.dev'))
+
 DEBUG = int(os.environ.get("DEBUG", default=0))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
@@ -50,7 +58,13 @@ INSTALLED_APPS = [
     'django_users',
 ]
 
-SITE_ID = 2
+SITE_ID = 1
+SITE_NAME = os.environ.get("SITE_NAME")
+SITE_DOMAIN = os.environ.get("SITE_DOMAIN")
+
+DJANGO_SUPERUSER_EMAIL = os.environ.get("DJANGO_SUPERUSER_EMAIL")
+DJANGO_SUPERUSER_USERNAME = os.environ.get("DJANGO_SUPERUSER_USERNAME")
+DJANGO_SUPERUSER_PASSWORD = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -89,11 +103,11 @@ WSGI_APPLICATION = 'hp_testwork.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'HOST': os.getenv('POSTGRES_HOST'),
-        'NAME': os.getenv('POSTGRES_DB'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'PORT': '5432',
+        'HOST': os.getenv('PGHOST'),
+        'NAME': os.getenv('PGDATABASE'),
+        'USER': os.getenv('PGUSER'),
+        'PASSWORD': os.getenv('PGPASSWORD'),
+        'PORT': os.getenv('PGPORT'),
     }
 }
 
@@ -144,11 +158,11 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.mail.ru'
-EMAIL_HOST_USER = 'stemix@mail.ru'
-EMAIL_HOST_PASSWORD = 't8TEexYqghHJH5gGih8A'
-EMAIL_PORT = 2525
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
 
-SERVER_EMAIL = 'stemix@mail.ru'
-DEFAULT_FROM_EMAIL = 'stemix@mail.ru'
+SERVER_EMAIL = os.getenv("SERVER_EMAIL")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")

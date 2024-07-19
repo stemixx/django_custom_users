@@ -5,11 +5,8 @@ ENV DJANGO_SETTINGS_MODULE=hp_testwork.settings
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# рабочая директория внутри проекта
+# Рабочая директория внутри проекта
 WORKDIR /usr/src/app
-
-# Устанавливаем зависимости из файла requirements.txt
-COPY requirements.txt .
 
 # Копируем все файлы проекта в Docker-контейнер
 COPY . .

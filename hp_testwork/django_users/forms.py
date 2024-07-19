@@ -10,7 +10,7 @@ from django import forms
 
 
 class CustomUserLoginForm(AuthenticationForm):
-    username = forms.EmailField(max_length=254, widget=forms.TextInput(attrs={'placeholder': 'e-mail'}))
+    username = forms.EmailField(max_length=254, widget=forms.EmailInput(attrs={'placeholder': 'e-mail'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'password'}))
 
 
@@ -70,7 +70,7 @@ class UserForgotPasswordForm(PasswordResetForm):
 
     class Meta:
         model = CustomUser
-        fields = ("email")
+        fields = ("email",)
 
     def __init__(self, *args, **kwargs):
         """
@@ -117,26 +117,6 @@ class UserRegisterForm(UserCreationForm):
             self.fields[field].widget.attrs.update({"class": "form-control", "autocomplete": "off"})
 
 
-class UserLoginForm(AuthenticationForm):
-    """
-    Форма авторизации на сайте
-    """
-
-    def __init__(self, *args, **kwargs):
-        """
-        Обновление стилей формы регистрации
-        """
-        super().__init__(*args, **kwargs)
-        for field in self.fields:
-            self.fields['email'].widget.attrs['placeholder'] = 'Логин пользователя'
-            self.fields['password'].widget.attrs['placeholder'] = 'Пароль пользователя'
-            self.fields['email'].label = 'Логин'
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control',
-                'autocomplete': 'off'
-            })
-
-
 class UserSetNewPasswordForm(SetPasswordForm):
     """
     Изменение пароля пользователя после подтверждения
@@ -164,7 +144,7 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 class CustomUserChangeForm(UserChangeForm):
-
+    email = forms.EmailField(disabled=True)
     class Meta:
         model = CustomUser
         fields = ('email',)

@@ -1,32 +1,55 @@
-version: '3'
+version: '3.8'
 services:
    web:
-       # Берем Dockerfile
+       # Берем Dockerfile из этой же папки и формируем контейнер web
        build: .
        container_name: django_users
-       # Открываем порт на машине и перенаправляем на такой же порт в контейнере
+       # Открываем порт на хост машине и пробрасываем на такой же порт в контейнере
        ports:
            - "8000:8000"
+       # Монтируем директорию проекта внутрь контейнера для отображения изменений внутри контейнера и наоборот
        volumes:
            - ./:/usr/src/app/
-       command: python manage.py runserver 127.0.0.1:8000
-
+       # Выполняем миграции,
+       # создаём суперпользователя по умолчанию,
+       # меняем url сайта на 127.0.0.1:8000,
+       # запускаем сервер
+       command: >
+           sh -c 'python manage.py makemigrations &&
+                  python manage.py migrate &&
+                  python manage.py create_default_superuser --no-input &&
+                  chmod +x change_site_name.sh &&
+                  ./change_site_name.sh &&
+                  python manage.py runserver 0.0.0.0:8000'
+       # Подключаем файл с переменными окружения
        env_file:
-           - .env.dev
-       # Зависимость от сервиса Postgres
+           - .docker.env.dev
+
+       # Вводим зависимость от базы данных
        depends_on:
-           - db
+           db:
+               # Вводим проверку доступности postgres
+               condition: service_healthy
 
    db:
-       image: postgres
+       # Берём образ postgres из Docker Hub и создаём контейнер
+       image: postgres:16.3
        container_name: postgres_django_users
-       # Связывание тома с директорией в контейнере для сохранения данных postgres
+       # Создаём том pg_data в docker host и связываем его с контейнером для сохранения данных БД
        volumes:
            - pg_data:/var/lib/postgresql/data/
+       # Открываем порт на хост машине и пробрасываем на такой же порт в контейнере
        ports:
            - "5432:5432"
        env_file:
-           - .env.dev
+           - .docker.env.dev
+       # Проверяем доступность БД перед стартом контейнера web
+       healthcheck:
+           test: ["CMD-SHELL", "pg_isready"]
+           interval: 5s
+           timeout: 5s
+           retries: 5
 
+# Создаём именованный том pg_data в docker host
 volumes:
     pg_data:

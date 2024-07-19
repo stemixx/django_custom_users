@@ -5,10 +5,13 @@
 {% endblock %}
 
 {% block content %}
-
+{% if user.is_authenticated %}
 <form method="post">
   {% csrf_token %}
   {{ form }}
 </form>
-
+{% else %}
+<p>Вы не можете просматривать эту страницу. Необходимо войти под своей учётной записью</p>
+{% endif %}
+{% include 'return_button.html' %}
 {% endblock %}

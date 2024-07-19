@@ -48,28 +48,28 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ["email", "password", "is_active", "is_staff"]
+        fields = ["password", "is_active", "is_staff"]
 
 
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = CustomUser
-    list_display = ('email', 'is_staff', 'is_active', 'is_superuser', 'id')
-    list_filter = ('email', 'is_staff', 'is_active', 'is_superuser')
+    list_display = ('email', 'username', 'is_staff', 'is_active', 'is_superuser', 'id')
+    list_filter = ('is_staff', 'is_active', 'is_superuser')
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active')}),
+        (None, {'fields': ('email', 'username', 'password')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'is_staff', 'is_active')
+            'fields': ('email', 'username', 'password1', 'password2', 'is_staff', 'is_active', 'is_superuser')
         }
         ),
     )
-    search_fields = ('email',)
-    ordering = ('email',)
+    search_fields = ('email', 'username')
+    ordering = ('email', 'username')
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
