@@ -16,6 +16,7 @@ from django.views.generic import DetailView, CreateView, View, TemplateView, Upd
 from django.urls import reverse_lazy
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
+from .services.mixins import UserIsNotAuthenticated
 from .models import CustomUser
 from .forms import (
     CustomUserLoginForm,
@@ -26,7 +27,7 @@ from .forms import (
     UserSetNewPasswordForm,
     UserForgotPasswordForm
 )
-from .services.mixins import UserIsNotAuthenticated
+from hp_testwork.settings import EMAIL_HOST_USER
 
 User = get_user_model()
 
@@ -84,7 +85,7 @@ class UserDetailView(DetailView):
     Просмотр данных о пользователе
     """
     model = CustomUser
-    context_object_name = 'user'
+    context_object_name = 'custom_user'
     template_name = 'user_detail.html'
     queryset = model.objects.all()
 
@@ -107,7 +108,7 @@ class UserEditView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'Редактирование данных пользователя: {self.request.user.email}'
+        context['title'] = f'Изменение данных пользователя {self.request.user.email}'
         if self.request.POST:
             context['user_form'] = UserUpdateForm(self.request.POST, instance=self.request.user)
         else:
@@ -155,7 +156,7 @@ class UserForgotPasswordView(SuccessMessageMixin, PasswordResetView):
     template_name = 'user_password_reset.html'
     success_url = reverse_lazy('main')
     success_message = 'Письмо с инструкцией по восстановлению пароля отправлена на ваш email'
-    subject_template_name = 'password_subject_reset_mail.txt'
+    subject_template_name = 'password_reset_subject.txt'
     email_template_name = 'password_reset_mail.html'
 
     def get_context_data(self, **kwargs):
@@ -205,7 +206,7 @@ class UserRegisterView(UserIsNotAuthenticated, CreateView):
             'Подтвердите свой электронный адрес',
             f'Пожалуйста, перейдите по следующей ссылке, чтобы подтвердить свой адрес электронной почты: '
             f'http://{current_site}{activation_url}',
-            'stemix@mail.ru',
+            f'{EMAIL_HOST_USER}',
             [user.email],
             fail_silently=False,
         )

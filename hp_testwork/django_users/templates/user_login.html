@@ -8,8 +8,7 @@
 {% block content %}
 <div class="text-center">
   <h1 class="text-center">Авторизация на сайте</h1>
-
-  <form method="post" action="{% url 'login' %}" style="display: inline;">
+  <form method="post" action="{% url 'login' %}">
     {% csrf_token %}
     <div class="mb-3">
       {{ form.username }}
@@ -17,16 +16,24 @@
     <div class="mb-3">
       {{ form.password }}
     </div>
-      <button type="submit" class="btn btn-primary">Войти</button>
+    {% if form.errors %}
+      <div class="alert alert-danger" role="alert">
+        {% for fields, errors in form.errors.items %}
+          {% for error in errors %}
+            {{ error }}
+          {% endfor %}
+        {% endfor %}
+      </div>
+    {% endif %}
+    <button type="submit" class="btn btn-primary">Войти</button>
   </form>
-  <form method="post" action="{% url 'register' %}" style="display: inline;">
+  <form method="post" action="{% url 'register' %}">
     {% csrf_token %}
     <button type="submit" class="btn btn-primary">Регистрация</button>
   </form>
-  <form method="post" action="{% url 'password_reset' %}" style="display: inline;">
+  <form method="post" action="{% url 'password_reset' %}">
     {% csrf_token %}
     <button type="submit" class="btn btn-danger">Забыли пароль?</button>
   </form>
-
 </div>
 {% endblock %}

@@ -9,14 +9,13 @@
 <h1 class="text-center">Регистрация на сайте</h1>
 <div class="card mb-3 border-0 nth-shadow">
   <div class="card-body">
-    <div class="card-title nth-card-title">
-    </div>
+    <div class="card-title nth-card-title"></div>
     <form method="post" action="{% url 'register' %}" enctype="multipart/form-data">
       {% csrf_token %}
       {{ form.as_p }}
       <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
     </form>
+    {% include 'return_button.html' %}
   </div>
 </div>
-
 {% endblock %}

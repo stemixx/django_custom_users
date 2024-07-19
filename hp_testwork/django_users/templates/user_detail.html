@@ -5,7 +5,6 @@
 {% endblock %}
 
 {% block content %}
-
 {% if user.is_authenticated %}
 <div class="card border-0">
   <div class="card-body">
@@ -21,12 +20,12 @@
             <li>Логин: {{ user.username }}</li>
             <li>Заходил: {{ user.last_login }}</li>
           </ul>
-          <a href="{% url 'user_edit' %}" class="btn btn-sm btn-primary">Редактировать профиль</a>
+          <a href="{% url 'user_edit' %}" class="btn btn-primary">Редактировать профиль</a>
+          {% include 'return_button.html' %}
         </div>
       </div>
     </div>
   </div>
 </div>
 {% endif %}
-
 {% endblock %}
